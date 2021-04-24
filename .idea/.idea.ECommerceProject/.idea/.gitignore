@@ -1,0 +1,13 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/projectSettingsUpdater.xml
+/.idea.ECommerceProject.iml
+/contentModel.xml
+# Datasource local storage ignored files
+/../../../../../../../../../:\Users\CASPER\source\repos\ECommerceProject\.idea\.idea.ECommerceProject\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
