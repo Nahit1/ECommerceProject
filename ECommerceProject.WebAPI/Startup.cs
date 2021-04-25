@@ -16,6 +16,7 @@ using ECommerceProject.Data;
 using ECommerceProject.Data.Repositories;
 using ECommerceProject.Service.Services;
 using ECommerceProject.WebAPI.Errors;
+using ECommerceProject.WebAPI.Extensions;
 using ECommerceProject.WebAPI.Helpers;
 using ECommerceProject.WebAPI.Middleware;
 using Microsoft.EntityFrameworkCore;
@@ -34,9 +35,6 @@ namespace ECommerceProject.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
             
             services.AddAutoMapper(typeof(MappingProfile));
             services.AddDbContext<ECommerceContext>(options =>
@@ -47,28 +45,19 @@ namespace ECommerceProject.WebAPI
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
-            
-            services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.InvalidModelStateResponseFactory = actionContext => 
-                {
-                    var errors = actionContext.ModelState
-                        .Where(e => e.Value.Errors.Count > 0)
-                        .SelectMany(x => x.Value.Errors)
-                        .Select(x => x.ErrorMessage).ToArray();
-                    
-                    var errorResponse = new ApiValidationErrorResponse
-                    {
-                        Errors = errors
-                    };
 
-                    return new BadRequestObjectResult(errorResponse);
-                };
-            });
+            services.AddApplicationService();
                 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ECommerceProject.WebAPI", Version = "v1" });
+            });
+            services.AddCors(opt => 
+            {
+                opt.AddPolicy("CorsPolicy", policy => 
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
+                });
             });
         }
 
@@ -90,6 +79,7 @@ namespace ECommerceProject.WebAPI
 
             app.UseRouting();
             app.UseStaticFiles();
+            app.UseCors("CorsPolicy");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

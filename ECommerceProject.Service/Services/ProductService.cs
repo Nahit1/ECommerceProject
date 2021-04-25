@@ -22,11 +22,16 @@ namespace ECommerceProject.Service.Services
 
         
 
-        public async Task<IReadOnlyList<Product>> GetProductsAsync(int? categoryId)
+        public async Task<IReadOnlyList<Product>> GetProductsAsync(ProductSpecParams specParams)
         {
-            var spec = new ProductAndCategorySpec(categoryId);
+            var spec = new ProductAndCategorySpec(specParams);
             var products = await _productRepo.ListAsync(spec);
             return products;
+        }
+
+        public async Task<int> CountAsync(ISpecification<Product> spec)
+        {
+            return await _productRepo.CountAsync(spec);
         }
     }
 }
